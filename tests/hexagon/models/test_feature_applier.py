@@ -1,10 +1,11 @@
 import pytest
 from pytest_mock import mocker
 
-from hexagon.use_cases import Repository, FeatureApplier
+from hexagon.use_cases import Repository, IRepository, FeatureApplier
+from hexagon.models import ApplierStatus
 
 _feature_applier: FeatureApplier | None = None
-_rep: Repository | None = None
+_rep: IRepository | None = None
 
 
 @pytest.fixture(autouse=True)
