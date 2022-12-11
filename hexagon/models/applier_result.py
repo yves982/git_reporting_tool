@@ -11,3 +11,7 @@ class ApplierResult:
     @property
     def status(self):
         return self._status
+
+    @property
+    def applied_commits(self):
+        return self._applied_commits

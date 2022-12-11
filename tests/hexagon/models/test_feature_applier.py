@@ -3,9 +3,10 @@ import json
 import pytest
 
 from hexagon.use_cases import IRepository, FeatureApplier
-from hexagon.models import ApplierStatus
+from hexagon.models import ApplierStatus, Commit
 
 from tests.fixtures import NoMatchingCommitsFix, SingleMatchingCommitFix
+from tests.helpers import assert_collection_equivalent
 
 _feature_applier: FeatureApplier | None = None
 _rep: IRepository | None = None
@@ -30,12 +31,16 @@ def setup(mocker):
     _feature_applier = FeatureApplier(_rep)
 
 
+def compare_commits_by_identifier(first_commit: Commit, second_commit: Commit):
+    return first_commit.id == second_commit.id
+
 @pytest.mark.feature_applier
 def test_feature_applier_no_matching_commits(mocker, no_matching_commits):
     _rep.branches.return_value = no_matching_commits.branches
 
     res = _feature_applier.apply(no_matching_commits.pattern)
     assert res.status == ApplierStatus.No_match
+    assert res.applied_commits == []
 
 @pytest.mark.feature_applier
 def test_feature_applier_single_matching_commit(mocker, single_matching_commit):
@@ -43,6 +48,8 @@ def test_feature_applier_single_matching_commit(mocker, single_matching_commit):
 
     res = _feature_applier.apply(single_matching_commit.pattern)
     assert res.status == ApplierStatus.Match
+    assert_collection_equivalent(res.applied_commits, single_matching_commit.commits,
+                                 "applied_commits", compare_commits_by_identifier)
 
 
 @pytest.mark.skip
