@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from hexagon.gateway import IRepositoryReader, IRepositoryCommander
-from .irepository import IRepository
+from hexagon.gateway import IRepositoryReader, IRepositoryCommander, IRepository
 
 
 class Repository(IRepository):

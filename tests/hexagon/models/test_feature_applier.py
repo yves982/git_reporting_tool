@@ -2,7 +2,8 @@ import json
 
 import pytest
 
-from hexagon.use_cases import IRepository, FeatureApplier
+from hexagon.use_cases import FeatureApplier
+from hexagon.gateway import IRepository
 from hexagon.models import ApplierStatus, Commit
 
 from tests.fixtures import NoMatchingCommitsFix, MatchingCommitsFix
@@ -39,7 +40,7 @@ def repository_error_matching_commit():
 @pytest.fixture(autouse=True)
 def setup(mocker):
     global _feature_applier, _rep
-    _rep = mocker.patch("hexagon.use_cases.irepository.IRepository")
+    _rep = mocker.patch("hexagon.gateway.irepository.IRepository")
     _feature_applier = FeatureApplier(_rep)
 
 
@@ -47,9 +48,15 @@ def compare_commits_by_identifier(first_commit: Commit, second_commit: Commit):
     return 0 if first_commit.id == second_commit.id else 1
 
 
+def extract_filtered_commits(matching_commits: MatchingCommitsFix):
+    filtered_commits = [commit for commit in matching_commits.commits if commit.id in matching_commits.applied_commits]
+    return filtered_commits
+
+
 @pytest.mark.feature_applier
 def test_feature_applier_no_matching_commits(mocker, no_matching_commits):
     _rep.branches.return_value = no_matching_commits.branches
+    _rep.filter_commits.return_value = []
 
     res = _feature_applier.apply(no_matching_commits.src_branch, no_matching_commits.target_branch,
                                  no_matching_commits.pattern)
@@ -61,6 +68,8 @@ def test_feature_applier_no_matching_commits(mocker, no_matching_commits):
 def test_feature_applier_single_matching_commit(mocker, matching_commits):
     _rep.branches.return_value = matching_commits.branches
     _rep.commits.return_value = matching_commits.commits
+    filtered_commits = extract_filtered_commits(matching_commits)
+    _rep.filter_commits.return_value = filtered_commits
 
     cherry_pick = mocker.spy(_rep, "cherry_pick")
 
@@ -79,6 +88,7 @@ def test_feature_applier_single_matching_commit(mocker, matching_commits):
 def test_feature_applier_repository_error(mocker, repository_error_matching_commit):
     _rep.branches.return_value = repository_error_matching_commit.branches
     _rep.commits.return_value = repository_error_matching_commit.commits
+    _rep.filter_commits.return_value = extract_filtered_commits(repository_error_matching_commit)
     err_message = "fail to connect to repository!"
     _rep.cherry_pick.side_effect = IOError(err_message)
 

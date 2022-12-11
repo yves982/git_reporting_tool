@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
-from .irepository import IRepository
+from ..gateway.irepository import IRepository
 from hexagon.models import ApplierStatus, ApplierResult
 
 
@@ -11,8 +11,7 @@ class FeatureApplier:
 
     def apply(self, src_branch: str, target_branch: str, pattern: str) -> ApplierResult:
         regex = re.compile(pattern, re.IGNORECASE)
-        matching_commits = [commit for commit in self.__repository.commits(src_branch)
-                            if regex.search(commit.message) is not None]
+        matching_commits = self.__repository.filter_commits(src_branch, pattern)
         has_matching_commits = len(matching_commits) > 0
         if has_matching_commits:
             for commit in matching_commits:
