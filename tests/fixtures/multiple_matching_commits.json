@@ -8,7 +8,12 @@
       "identifier": "0e0d4266-3594-4cda-b183-6282295cbcd6",
       "message": "merged branch feature/PAIE-3345-awesome-feature into 'develop'",
       "date": "2022-02-01T00:00:00.000Z"
+    },
+    {
+      "identifier": "0e0d4266-3594-4cda-b183-6282295cb256",
+      "message": "merged branch feature/PAIE-3345-fix-bug into 'develop'",
+      "date": "2022-02-03T00:00:00.000Z"
     }
   ],
-  "applied_commits": ["0e0d4266-3594-4cda-b183-6282295cbcd6"]
+  "applied_commits": ["0e0d4266-3594-4cda-b183-6282295cbcd6", "0e0d4266-3594-4cda-b183-6282295cb256"]
 }

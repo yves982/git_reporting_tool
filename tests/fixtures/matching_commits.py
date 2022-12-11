@@ -5,7 +5,7 @@ from uuid import UUID
 from dateutil.parser import parse
 
 
-class SingleMatchingCommitFix:
+class MatchingCommitsFix:
     def __init__(self, raw_json: Mapping[str, object]):
         self.branches: List[str] = raw_json['branches']
         self.src_branch: str = raw_json['src_branch']
