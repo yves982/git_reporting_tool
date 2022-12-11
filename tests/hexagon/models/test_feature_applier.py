@@ -21,7 +21,7 @@ def no_matching_commits():
 @pytest.fixture
 def single_matching_commit():
     with open("tests/fixtures/single_matching_commit.json", "r", encoding="utf-8") as f:
-        return SingleMatchingCommitFix(**json.load(f))
+        return SingleMatchingCommitFix(json.load(f))
 
 
 @pytest.fixture(autouse=True)
@@ -32,21 +32,24 @@ def setup(mocker):
 
 
 def compare_commits_by_identifier(first_commit: Commit, second_commit: Commit):
-    return first_commit.id == second_commit.id
+    return 0 if first_commit.id == second_commit.id else 1
 
 @pytest.mark.feature_applier
 def test_feature_applier_no_matching_commits(mocker, no_matching_commits):
     _rep.branches.return_value = no_matching_commits.branches
 
-    res = _feature_applier.apply(no_matching_commits.pattern)
+    res = _feature_applier.apply(no_matching_commits.src_branch, no_matching_commits.target_branch,
+                                 no_matching_commits.pattern)
     assert res.status == ApplierStatus.No_match
     assert res.applied_commits == []
 
 @pytest.mark.feature_applier
 def test_feature_applier_single_matching_commit(mocker, single_matching_commit):
     _rep.branches.return_value = single_matching_commit.branches
+    _rep.commits.return_value = single_matching_commit.commits
 
-    res = _feature_applier.apply(single_matching_commit.pattern)
+    res = _feature_applier.apply(single_matching_commit.src_branch, single_matching_commit.target_branch,
+                                 single_matching_commit.pattern)
     assert res.status == ApplierStatus.Match
     assert_collection_equivalent(res.applied_commits, single_matching_commit.commits,
                                  "applied_commits", compare_commits_by_identifier)
