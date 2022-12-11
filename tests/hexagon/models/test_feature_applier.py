@@ -48,11 +48,15 @@ def test_feature_applier_single_matching_commit(mocker, single_matching_commit):
     _rep.branches.return_value = single_matching_commit.branches
     _rep.commits.return_value = single_matching_commit.commits
 
+    cherry_pick = mocker.spy(_rep, "cherry_pick")
+
     res = _feature_applier.apply(single_matching_commit.src_branch, single_matching_commit.target_branch,
                                  single_matching_commit.pattern)
     assert res.status == ApplierStatus.Match
     assert_collection_equivalent(res.applied_commits, single_matching_commit.commits,
                                  "applied_commits", compare_commits_by_identifier)
+    assert cherry_pick.call_count == len(single_matching_commit.commits), "All advertised commits were not commited !"
+
 
 
 @pytest.mark.skip
