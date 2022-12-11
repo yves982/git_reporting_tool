@@ -27,10 +27,8 @@ def setup(mocker):
 @pytest.mark.feature_applier
 def test_feature_applier_no_matching_commits(mocker, no_matching_commits):
     _rep.branches.return_value = no_matching_commits.branches
-    commit_spy = mocker.spy(_rep, "commits")
 
     res = _feature_applier.apply(no_matching_commits.pattern)
-    assert commit_spy.call_count == 0, "commits should not be called"
     assert res.status == ApplierStatus.No_match
 
 
