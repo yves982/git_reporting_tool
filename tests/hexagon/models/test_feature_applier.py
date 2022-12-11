@@ -15,7 +15,12 @@ def setup(repository):
 
 
 def test_feature_applier_no_matching_commits():
-    pass
+    _rep.branches.return_value = ["PAIE-4322-test"]
+    commit_spy = mocker.spy(_rep, "commits")
+
+    res = _feature_applier.apply(r"PAIE-4429")
+    assert commit_spy.call_count == 0, "commits should not be called"
+    assert res.status == ApplierStatus.NoMatch
 
 
 def test_feature_applier_single_matching_commit():
