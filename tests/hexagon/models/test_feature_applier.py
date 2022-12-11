@@ -70,10 +70,5 @@ def test_feature_applier_single_matching_commit(mocker, matching_commits):
 
 
 @pytest.mark.skip
-def test_feature_applier_multiple_matching_commits():
-    pass
-
-
-@pytest.mark.skip
 def test_feature_applier_repository_error():
     pass
