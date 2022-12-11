@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+iniconfig = "==1.1.1"
 
 [dev-packages]
 

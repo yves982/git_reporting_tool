@@ -7,6 +7,7 @@ class Commit:
     """
     A commit DTO
     """
+
     def __init__(self, identifier: uuid.UUID, message: str, date: datetime = datetime.utcnow()):
         self.__id: uuid.UUID = identifier
         self.__message: str = message

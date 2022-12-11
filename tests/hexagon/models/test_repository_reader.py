@@ -1,12 +1,11 @@
 import re
-
-import pytest
 import uuid
 from datetime import datetime, timedelta
-from pytest_mock import mocker
+from itertools import product
 from typing import List
 
-from itertools import product
+import pytest
+
 from hexagon.gateway import IRepositoryReader
 from hexagon.models import Commit
 from hexagon.use_cases import Repository
