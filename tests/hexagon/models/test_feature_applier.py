@@ -1,21 +1,27 @@
 import json
 
 import pytest
-from pytest_mock import mocker
 
-from hexagon.use_cases import Repository, IRepository, FeatureApplier
+from hexagon.use_cases import IRepository, FeatureApplier
 from hexagon.models import ApplierStatus
-import io
 
-from tests.fixtures import NoMatchingCommitsFix
+from tests.fixtures import NoMatchingCommitsFix, SingleMatchingCommitFix
 
 _feature_applier: FeatureApplier | None = None
 _rep: IRepository | None = None
+
 
 @pytest.fixture
 def no_matching_commits():
     with open("tests/fixtures/no_matching_commits.json", "r", encoding="utf-8") as f:
         return NoMatchingCommitsFix(**json.load(f))
+
+
+@pytest.fixture
+def single_matching_commit():
+    with open("tests/fixtures/single_matching_commit.json", "r", encoding="utf-8") as f:
+        return SingleMatchingCommitFix(**json.load(f))
+
 
 @pytest.fixture(autouse=True)
 def setup(mocker):
@@ -31,14 +37,18 @@ def test_feature_applier_no_matching_commits(mocker, no_matching_commits):
     res = _feature_applier.apply(no_matching_commits.pattern)
     assert res.status == ApplierStatus.No_match
 
+@pytest.mark.feature_applier
+def test_feature_applier_single_matching_commit(mocker, single_matching_commit):
+    _rep.branches.return_value = single_matching_commit.branches
 
-@pytest.mark.skip
-def test_feature_applier_single_matching_commit():
-    pass
+    res = _feature_applier.apply(single_matching_commit.pattern)
+    assert res.status == ApplierStatus.Match
+
 
 @pytest.mark.skip
 def test_feature_applier_multiple_matching_commits():
     pass
+
 
 @pytest.mark.skip
 def test_feature_applier_repository_error():
