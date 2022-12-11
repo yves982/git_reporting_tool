@@ -1,4 +1,6 @@
 {
+  "src_branch": "develop",
+  "target_branch": "master",
   "pattern": "PAIE-4429",
   "branches": ["PAIE-4322-test"]
 }

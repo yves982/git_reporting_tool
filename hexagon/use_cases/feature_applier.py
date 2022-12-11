@@ -9,10 +9,11 @@ class FeatureApplier:
     def __init__(self, repository: IRepository):
         self.__repository = repository
 
-    def apply(self, pattern: str) -> ApplierResult:
+    def apply(self, src_branch: str, target_branch: str, pattern: str) -> ApplierResult:
         regex = re.compile(pattern, re.IGNORECASE)
-        matching_branches = [x for x in self.__repository.branches() if regex.search(x) is not None]
-        has_matching_branches = len(matching_branches) > 0
-        if has_matching_branches:
-            return ApplierResult(ApplierStatus.Match, [])
-        return ApplierResult(ApplierStatus.No_match, [])
+        matching_commits = [commit for commit in self.__repository.commits(src_branch)
+                            if regex.search(commit.message) is not None]
+        has_matching_commits = len(matching_commits) > 0
+        if has_matching_commits:
+            return ApplierResult(ApplierStatus.Match, matching_commits)
+        return ApplierResult(ApplierStatus.No_match, matching_commits)
