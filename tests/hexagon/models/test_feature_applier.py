@@ -30,6 +30,12 @@ def matching_commits(request):
         return MatchingCommitsFix(json.load(f))
 
 
+@pytest.fixture()
+def repository_error_matching_commit():
+    with open("tests/fixtures/repository_error_matching_commit.json", "r", encoding="utf-8") as f:
+        return MatchingCommitsFix(json.load(f))
+
+
 @pytest.fixture(autouse=True)
 def setup(mocker):
     global _feature_applier, _rep
@@ -69,6 +75,15 @@ def test_feature_applier_single_matching_commit(mocker, matching_commits):
             f"Missing commit {str(commit_id)} call !"
 
 
-@pytest.mark.skip
-def test_feature_applier_repository_error():
-    pass
+@pytest.mark.feature_applier
+def test_feature_applier_repository_error(mocker, repository_error_matching_commit):
+    _rep.branches.return_value = repository_error_matching_commit.branches
+    _rep.commits.return_value = repository_error_matching_commit.commits
+    err_message = "fail to connect to repository!"
+    _rep.cherry_pick.side_effect = IOError(err_message)
+
+    with pytest.raises(IOError) as io_err:
+        _feature_applier.apply(repository_error_matching_commit.src_branch,
+                               repository_error_matching_commit.target_branch,
+                               repository_error_matching_commit.pattern)
+        assert io_err.value.args[0] == err_message
