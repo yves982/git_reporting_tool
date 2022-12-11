@@ -56,6 +56,9 @@ def test_feature_applier_single_matching_commit(mocker, single_matching_commit):
     assert_collection_equivalent(res.applied_commits, single_matching_commit.commits,
                                  "applied_commits", compare_commits_by_identifier)
     assert cherry_pick.call_count == len(single_matching_commit.commits), "All advertised commits were not commited !"
+    for commit_id in single_matching_commit.applied_commits:
+        cherry_pick.assert_called_with(str(commit_id), single_matching_commit.target_branch, True), \
+            f"Missing commit {str(commit_id)} call !"
 
 
 
